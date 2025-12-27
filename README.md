@@ -1,2 +1,1 @@
 # safi-mail
-secured mail
