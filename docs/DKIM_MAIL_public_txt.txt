@@ -1,0 +1,5 @@
+# DKIM DNS kaydı (selector = mail)
+# TXT record name: mail._domainkey.safi.com
+# TXT value: v=DKIM1; k=rsa; p=<PUBLIC_KEY>
+
+mail._domainkey.safi.com IN TXT "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2mfrIC0DtBvYrSqlC0SnPqBB8kK9eDb0uNFKAcimX/nMaQpRxFdsXRlkeIU2A25sbuEBW9KMd/pVgoBUqI/v1lQ1fZ/M4YRfpEF4lfV6k0tXPggo2wJlTmXLOWZ7W6A4q0ZxfwoP7yhJfgFWLFdgDWzXETg93rb5OT1Pnn8wvmi/T9xcUrA1aFayNerxM07BNSJ/05Ng5ZTewFQALinkQYU3yGCQdqNO+abthdyGI/Nu8BDw9n8h5txVnsx12BuHSRgXwsFx9I8a6L6cwIsM8mciJrnoG7B392q7g/bP4dgDoBFQN00GGJIlzBFXa7JyBTQaICXC76EuaRCF+3D6DQIDAQAB"
