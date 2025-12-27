@@ -38,3 +38,12 @@ Bu doküman, `ui/` klasöründe bulunan Next.js admin iskeletini açıklıyor. �
 ## Deploy önerisi
 - `ui`'yi Docker image olarak build edip reverse proxy (traefik/nginx) ile `admin.safi.com`'a yönlendirin.
 - Mailcow ile güvenli iletişim için aynı internal network üzerinde olması önerilir.
+
+## PR Preview (Vercel)
+Bu repo için PR açıldığında otomatik preview deploy yapmak için bir GitHub Action ekledim (`.github/workflows/preview_vercel.yml`). Preview çalışması için aşağıdaki repo secret'ları eklemeniz gerekir:
+
+- `VERCEL_TOKEN` — Vercel account token
+- `VERCEL_ORG_ID` — Vercel org id
+- `VERCEL_PROJECT_ID` — Vercel project id
+
+Ayarlar tamamlandığında her PR için UI build edilip Vercel'e preview deploy edilecek ve PR üzerine preview URL'si yorum olarak eklenecektir. Eğer Vercel yerine Netlify veya Vercel'in GitHub bağlantısını kullanmak isterseniz onu da yapılandırırım.
