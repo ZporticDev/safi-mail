@@ -46,4 +46,15 @@ Bu repo için PR açıldığında otomatik preview deploy yapmak için bir GitHu
 - `VERCEL_ORG_ID` — Vercel org id
 - `VERCEL_PROJECT_ID` — Vercel project id
 
-Ayarlar tamamlandığında her PR için UI build edilip Vercel'e preview deploy edilecek ve PR üzerine preview URL'si yorum olarak eklenecektir. Eğer Vercel yerine Netlify veya Vercel'in GitHub bağlantısını kullanmak isterseniz onu da yapılandırırım.
+Ayarlar tamamlandığında her PR için UI build edilip Netlify veya Vercel'e preview deploy edilecek ve PR üzerine preview URL'si yorum olarak eklenecektir.
+
+### Netlify preview
+Bu repo için PR açıldığında otomatik preview deploy yapmak için bir GitHub Action ekledim (`.github/workflows/preview_netlify.yml`). Preview çalışması için aşağıdaki repo secret'ları eklemeniz gerekir:
+
+- `NETLIFY_AUTH_TOKEN` — Netlify personal access token
+- `NETLIFY_SITE_ID` — Netlify site ID
+
+Ayarlar tamamlandığında her PR için UI export edilip (static `next export`) Netlify'e preview deploy edilecek ve PR üzerine preview URL'si yorum olarak eklenecektir.
+
+Not: Bu preview, `next export` ile oluşturulan statik çıktıyı kullanır; API route'ları içermez. Eğer API route'larıyla tam preview isterseniz Netlify'in Next.js özellikleri veya alternatif bir host çözümü yapılandırılabilir.
+
