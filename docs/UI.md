@@ -48,13 +48,20 @@ Bu repo için PR açıldığında otomatik preview deploy yapmak için bir GitHu
 
 Ayarlar tamamlandığında her PR için UI build edilip Netlify veya Vercel'e preview deploy edilecek ve PR üzerine preview URL'si yorum olarak eklenecektir.
 
-### Netlify preview
-Bu repo için PR açıldığında otomatik preview deploy yapmak için bir GitHub Action ekledim (`.github/workflows/preview_netlify.yml`). Preview çalışması için aşağıdaki repo secret'ları eklemeniz gerekir:
+### Netlify preview (serverful Next.js)
+Bu repo için PR açıldığında **Netlify Next.js plugin** kullanarak serverful preview deploy yapmak üzere bir GitHub Action ekledim (`.github/workflows/preview_netlify.yml`). Bu yapılandırma API route'larını da destekleyecek şekilde Netlify'in Next.js plugin'ini kullanır.
 
+Gerekli repo secret'ları:
 - `NETLIFY_AUTH_TOKEN` — Netlify personal access token
 - `NETLIFY_SITE_ID` — Netlify site ID
 
-Ayarlar tamamlandığında her PR için UI export edilip (static `next export`) Netlify'e preview deploy edilecek ve PR üzerine preview URL'si yorum olarak eklenecektir.
+Ayarlar tamamlandığında workflow otomatik olarak:
+1. `netlify build` çalıştırır (repo kökünde `netlify.toml` kullanılır),
+2. Oluşan `.netlify/output/public` dizinini Netlify'e deploy eder,
+3. PR üzerine preview URL'sini yorum olarak ekler.
 
-Not: Bu preview, `next export` ile oluşturulan statik çıktıyı kullanır; API route'ları içermez. Eğer API route'larıyla tam preview isterseniz Netlify'in Next.js özellikleri veya alternatif bir host çözümü yapılandırılabilir.
+Notlar:
+- `netlify.toml` köke eklendi ve `@netlify/plugin-nextjs` kullanılıyor.
+- Netlify site ayarlarında ek konfig gerektirmez; ancak özel ortamlar veya Netlify ek pluginleri için site ayarlarınızı kontrol edin.
+- Eğer isterseniz ben Netlify üzerinde tam yapılandırma adımlarını (site ayarı, token alma, site id bulma) adım adım gösterebilirim.
 

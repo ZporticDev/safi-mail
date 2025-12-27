@@ -1,4 +1,4 @@
-name: PR Preview Deploy (Netlify)
+name: PR Preview Deploy (Netlify - Next)
 
 on:
   pull_request:
@@ -13,30 +13,27 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - name: Install dependencies (ui)
-        working-directory: ui
-        run: npm ci
-      - name: Export static (ui)
-        working-directory: ui
-        run: npm run export
+      - name: Install netlify CLI
+        run: npm i -g netlify-cli
+      - name: Netlify build (uses @netlify/plugin-nextjs)
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: |
+          netlify build --context=deploy-preview
       - name: Deploy to Netlify (preview)
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
-          npx netlify-cli deploy --auth="$NETLIFY_AUTH_TOKEN" --site="$NETLIFY_SITE_ID" --dir=out --json > netlify-deploy.json
-          cat netlify-deploy.json
-          DEPLOY_URL=$(jq -r '.url' netlify-deploy.json)
-          echo "Preview URL: $DEPLOY_URL"
-          echo "::set-output name=preview_url::$DEPLOY_URL"
+          netlify deploy --auth="$NETLIFY_AUTH_TOKEN" --site="$NETLIFY_SITE_ID" --dir=".netlify/output/public" --json > netlify-deploy.json
+          node -e "console.log(JSON.parse(require('fs').readFileSync('netlify-deploy.json')).url)" > preview_url.txt
       - name: Comment PR with preview URL
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs')
-            const d = JSON.parse(fs.readFileSync('netlify-deploy.json','utf8'))
-            const url = d.url
+            const url = fs.readFileSync('preview_url.txt','utf8').trim()
             const pr = context.payload.pull_request.number
             await github.rest.issues.createComment({
               owner: context.repo.owner,
@@ -47,5 +44,7 @@ jobs:
 
 # Notes:
 # - Requires repo secrets: NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID
-# - This workflow exports a static version (`next export`) so API routes are not deployed; it's for UI previews only.
-# - For serverful previews (API routes), consider deploying to platforms that support Next.js server functions (Netlify's Next plugin may be configured separately).
+# - This workflow uses Netlify's Next.js plugin to build serverful Next apps and deploy the output for previews.
+# - Ensure `netlify.toml` is present at repo root with the plugin configured.
+# - For production deploys via Netlify UI, configure Site settings / build & deploy as usual.
+
