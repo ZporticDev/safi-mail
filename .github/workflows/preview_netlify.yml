@@ -1,0 +1,51 @@
+name: PR Preview Deploy (Netlify)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  deploy_preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies (ui)
+        working-directory: ui
+        run: npm ci
+      - name: Export static (ui)
+        working-directory: ui
+        run: npm run export
+      - name: Deploy to Netlify (preview)
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          npx netlify-cli deploy --auth="$NETLIFY_AUTH_TOKEN" --site="$NETLIFY_SITE_ID" --dir=out --json > netlify-deploy.json
+          cat netlify-deploy.json
+          DEPLOY_URL=$(jq -r '.url' netlify-deploy.json)
+          echo "Preview URL: $DEPLOY_URL"
+          echo "::set-output name=preview_url::$DEPLOY_URL"
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs')
+            const d = JSON.parse(fs.readFileSync('netlify-deploy.json','utf8'))
+            const url = d.url
+            const pr = context.payload.pull_request.number
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr,
+              body: `Netlify preview deployed: ${url}`
+            })
+
+# Notes:
+# - Requires repo secrets: NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID
+# - This workflow exports a static version (`next export`) so API routes are not deployed; it's for UI previews only.
+# - For serverful previews (API routes), consider deploying to platforms that support Next.js server functions (Netlify's Next plugin may be configured separately).
